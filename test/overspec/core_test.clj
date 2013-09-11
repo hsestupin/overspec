@@ -14,36 +14,43 @@
 
 (deftest b-test
   (let [a 3]
+
     (describe "mmm"
-      (:before-each
-        (fn []))))
 
-  (describe "what a describing"
-    (:before-each (do
-                                        (printa)
-                                        (println-from-other-ns)
-                    (println "bef")
-                    ))
-    (:after-each (do
-                   (println "c")
-                   (println "b")))
+;      (:before-each (do (println "abc")))
+      (:after-each (do
+                      (println "c")
+                      (println "b")))
+;      (it "qq" (println "ff"))
+      (println "ab")))
 
-    (it "what an it block"
-      (let [a 3]
-        (expect a (to-be 5) "a is 3"))
-      (expect (+ 2 3) (to-be (- 6 1)) "5 is 5"))
-    (it "success it"
-      (println "i am inside"))
+  (let [b "bef"]
+    (describe "what a describing"
+      (:before-each (do
+                      (printa)
+                      (println-from-other-ns)
+                      (fn [] (println b))
+                      ))
+      (:after-each (do
+                     (println "c")
+                     (println "b")))
 
-    (describe " nested describe "
-      (:before-each (println "nested before"))
-      (:after-each (println "nested after"))
+      (it "what an it block"
+        (let [a 3]
+          (expect a (to-be 5) "a is 3"))
+        (expect (+ 2 3) (to-be (- 6 1)) "5 is 5"))
+      (it "success it"
+        (println "i am inside"))
 
-      (it "description nested it"
-        (println "nested it"))
+      (describe " nested describe "
+        (:before-each (println "nested before"))
+        (:after-each (println "nested after"))
 
-      (it "failing nested it"
-        (expect 3 (to-be-falsy))))))
+        (it "description nested it"
+          (println "nested it"))
+
+        (it "failing nested it"
+          (expect 3 (to-be-falsy)))))))
 
 (deftest truthy-test
   (testing "truthy testing"

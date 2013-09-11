@@ -46,8 +46,8 @@
 
 (defmacro invoke-all [each-blocks]
   `(binding [*ns* (the-ns ~*ns*)]
-    (doseq [each-block# ~each-blocks]
-      (eval `(do ~@each-block#)))))
+     (doseq [each-block# ~each-blocks]
+       (eval `(do ~@each-block#)))))
 
 (defmacro it
   [string & body]
@@ -55,9 +55,10 @@
          current-afters# (remove nil? *afters*)]
 
      (binding [*testing-contexts* (conj *testing-contexts* ~string)]
-       (invoke-all current-befores#)
+;       (invoke-all current-befores#)
        (do ~@body)
-       (invoke-all (reverse current-afters#))))) ;; invoke after-each blocks in reverse order
+;       (invoke-all (reverse current-afters#))
+       ))) ;; invoke after-each blocks in reverse order
 
 (defmacro describe
   [string & body]
@@ -67,7 +68,12 @@
     (assert-each-block-count :before-each befores)
     (assert-each-block-count :after-each afters)
 
+    (println "!befores" befores)
     `(binding [*befores* (conj *befores* (nfirst '~befores))
                *afters* (conj *afters* (nfirst '~afters))
                *testing-contexts* (conj *testing-contexts* ~string)]
        (do ~@others))))
+
+(defmacro m [body]
+  (let [a (doall (filter nil? '(1 2)))]
+    `(println "a: " '~a)))
