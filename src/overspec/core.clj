@@ -1,64 +1,38 @@
 (ns overspec.core
-  (:use [clojure.test]
-        [overspec.utils]))
+  (:use clojure.test
+        overspec.matchers
+        overspec.utils))
 
-(def ^:dynamic *not?* false) ; it's true if core.clojure/not was used odd number of times
-(def ^:dynamic *befores* [])
-(def ^:dynamic *afters* [])
-(def ^:dynamic *current-spec* nil)
+(def ^:dynamic *before-fns* [])
+(def ^:dynamic *after-fns* [])
+(def ^:dynamic *within-spec?* false)
+
+(defmacro when-within-spec [body]
+  `(if *within-spec?*
+    ~body
+    (throw (IllegalArgumentException. "Spec is undefined"))))
 
 (defmacro expect
   ([x expectation]
     `(expect ~x ~expectation nil))
   ([x expectation msg]
     (if (starts-with-not? expectation)
-      `(binding [*not?* (not *not?*)]
-         (expect ~x ~@(rest expectation) ~msg))
-      `(~@expectation ~x ~msg))))
-
-; MATCHERS
-
-(defmacro to-be [expected actual msg]
-  `(if *not?*
-     (try-expr ~msg (~'not= ~actual ~expected))
-     (try-expr ~msg (~'= ~actual ~expected))))
-
-(defmacro to-be-truthy [actual msg]
-  `(if *not?*
-     (try-expr ~msg (~'false? ~actual))
-     (try-expr ~msg (~'true? ~actual))))
-
-
-(defmacro to-be-falsy [actual msg]
-  `(if *not?*
-     (try-expr ~msg (~'true? ~actual))
-     (try-expr ~msg (~'false? ~actual))))
-
-(defmacro to-be-nil [actual msg]
-  `(if *not?*
-     (try-expr ~msg (~'not (~'nil? ~actual)))
-     (try-expr ~msg (~'nil? ~actual))))
-
-(defmacro to-contain [key coll msg]
-  `(if *not?*
-     (try-expr ~msg (~'not (~'contains? ~coll ~key)))
-     (try-expr ~msg (~'contains? ~coll ~key))))
-
-(defmacro invoke-all [each-blocks]
-  `(binding [*ns* (the-ns ~*ns*)]
-     (doseq [each-block# ~each-blocks]
-       (eval `(do ~@each-block#)))))
+      `(when-within-spec
+         (binding [overspec.matchers/*not?* (not overspec.matchers/*not?*)]
+           (expect ~x ~@(rest expectation) ~msg)))
+      `(when-within-spec
+         (~@expectation ~x ~msg)))))
 
 (defmacro it
   [string & body]
-  `(let [current-befores# (remove nil? *befores*)
-         current-afters# (remove nil? *afters*)]
-
-     (binding [*testing-contexts* (conj *testing-contexts* ~string)]
-;       (invoke-all current-befores#)
+  `(let [current-before-fns# (remove nil? *before-fns*)
+         current-after-fns# (remove nil? *after-fns*)]
+     (when *within-spec?* (throw (IllegalArgumentException. "Nested (it) blocks are not allowed")))
+     (binding [*testing-contexts* (conj *testing-contexts* ~string)
+               *within-spec?* true]
+       (invoke-all current-before-fns#)
        (do ~@body)
-;       (invoke-all (reverse current-afters#))
-       ))) ;; invoke after-each blocks in reverse order
+       (invoke-all (reverse current-after-fns#))))) ; invoke after-each fns in reverse order
 
 (defmacro describe
   [string & body]
@@ -68,12 +42,7 @@
     (assert-each-block-count :before-each befores)
     (assert-each-block-count :after-each afters)
 
-    (println "!befores" befores)
-    `(binding [*befores* (conj *befores* (nfirst '~befores))
-               *afters* (conj *afters* (nfirst '~afters))
+    `(binding [*before-fns* (conj *before-fns* ~(second (first befores)))
+               *after-fns* (conj *after-fns* ~(second (first afters)))
                *testing-contexts* (conj *testing-contexts* ~string)]
-       (do ~@others))))
-
-(defmacro m [body]
-  (let [a (doall (filter nil? '(1 2)))]
-    `(println "a: " '~a)))
+       ~@others)))
