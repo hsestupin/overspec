@@ -5,8 +5,8 @@ Clojure port of Jasmine BDD (https://github.com/pivotal/jasmine).
 
 Documentation can be found here http://pivotal.github.io/jasmine/
 
-Example of test specs.
-=====
+**Example of test specs**
+
 ```clojure
 (deftest my-test
   (let [foo (atom nil)]
@@ -30,8 +30,8 @@ Example of test specs.
             (expect @foo (to-be @bar))))))))
 ```
 
-Define your own matchers
-=====
+**Define your own matchers**
+
 You could define your own matchers with defmatcher macro. Lets assume you want to make sure that expected value belongs to interval between a and b:
 
 ```clojure
@@ -46,6 +46,6 @@ In this case your custom matcher can be defined like this:
 
 Argument "actual" should be the last one.
 
-Will be supported in future releases
-=====
+**Will be supported in future releases**
+
 Spies (http://pivotal.github.io/jasmine/#section-Spies)
