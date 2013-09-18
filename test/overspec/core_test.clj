@@ -4,59 +4,89 @@
         overspec.matchers
         overspec.other-ns))
 
-(deftest not-test
-  (describe "FIXME, Me fail TOO."
-    (it "defining spec"
-      (expect (+ 1 3) (not (to-be 5)) "4 should not equal to 5"))))
-
-(defn printa []
-  (println "a"))
-(defn printb []
-  (println "b"))
-
-(deftest b-test
-  ;  (let [a 3]
-  ;
-  ;    (describe "mmm"
-  ;
-  ;      (:before-each (do (println "abc")))
-  ;      (:after-each #(do (println "abc") %1))
-  ;      ;      (it "qq" (println "ff"))
-  ;      (it "ff"
-  ;        (println "fffff"))
-  ;      (println "ab")))
-
-  (let [b "bef"]
-    (describe "what a describing"
-      (:before-each (do
-                      (printa)
-                      (println-from-other-ns)
-                      (fn [] (println b))
-                      ))
-      (:after-each (do
-                     (println "c")
-                     (println "b")))
-
-      (it "what an it block"
-        (let [a 3]
-          (expect a (to-be 5) "a is 3"))
-        (expect (+ 2 3) (to-be (- 6 1)) "5 is 5"))
-      (it "success it"
-        (println "i am inside"))
-
-      (describe " nested describe "
-        (:before-each (println "nested before"))
-        (:after-each (println "nested after"))
-
-        (it "description nested it"
-          (println "nested it"))
-
-        (it "failing nested it"
-          (expect 3 (to-be-falsy)))))))
-
 (deftest matchers-test
-  (describe "testing"
-    (it "matchers"
-      (expect (= 1 1) (to-be-truthy))
-      (expect false (to-be-falsy))
-      (expect nil (to-be-nil)))))
+  (describe "testing matchers:"
+
+    (it "to-be"
+      (let [x 3]
+        (is (= x 3))
+        (expect x (to-be 3))))
+
+    (it "to-be-truthy"
+      (let [x (= 1 1)]
+        (is (true? x))
+        (expect x (to-be-truthy))))
+
+    (it "to-be-falsy"
+      (let [x (= 1 2)]
+        (is (false? x))
+        (expect x (to-be-falsy))))
+
+    (it "to-be-nil"
+      (let [x nil]
+        (is (nil? x))
+        (expect nil (to-be-nil))))
+
+    (it "to-contain"
+      (let [x #{:a :b :c }]
+        (is (contains? x :a ))
+        (expect x (to-contain :a )))
+
+      (let [x {:a "a" :b "b"}]
+        (is (contains? x :a ))
+        (expect x (to-contain :a )))
+
+      (let [x [:a :b ]]
+        (is (contains? x 1))
+        (expect x (to-contain 1)))))
+
+  (it "with negation"
+    (expect 1 (not (to-be 2)))
+    (expect 1 (not (not (to-be 1))))
+    (expect 1 (not (not (not (to-be 2)))))))
+
+(deftest nested-spec-test
+  (let [executed-code (atom #{})]
+    (describe "Global describe starts."
+      (swap! executed-code conj :global-before-spec )
+
+      (it "Global spec."
+        (swap! executed-code conj :global-inside-spec ))
+
+      (describe "Nested decribe start."
+        (swap! executed-code conj :nested-beyond-spec )
+        (it "Nested spec."
+          (swap! executed-code conj :nested-inside-spec )))
+
+      (swap! executed-code conj :global-after-spec ))
+
+    (is (= @executed-code
+            #{:global-inside-spec :global-before-spec :global-after-spec :nested-beyond-spec :nested-inside-spec }))))
+
+(deftest before&after-each-test
+  (let [state (atom [])]
+    (describe "<describe 1>"
+      (:before-each #(swap! state conj :before-1 ))
+      (:after-each #(swap! state conj :after-1 ))
+      (is (empty? @state))
+      (it "<spec 1>"
+        (is (= @state [:before-1 ])))
+      (is (= @state [:before-1 :after-1 ]))
+
+      (describe "<describe 2>"
+        (:before-each #(swap! state conj :before-2 ))
+        ;        after-each block is missing by design
+        (swap! state empty)
+        (it "<spec 2>"
+          (is (= @state [:before-1 :before-2 ])))
+        (is (= @state [:before-1 :before-2 :after-1 ]))
+
+        (describe "<describe 3>"
+          (:before-each #(swap! state conj :before-3 ))
+          (:after-each #(swap! state conj :after-3 ))
+
+          (swap! state empty)
+          (it "<spec 3>"
+            (is (= @state [:before-1 :before-2 :before-3 ])))
+
+          (is (= @state [:before-1 :before-2 :before-3 :after-3 :after-1 ])))))))
