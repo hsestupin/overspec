@@ -54,10 +54,10 @@
         (expect x (to-contain 1))
         (should-fail (expect x (to-contain 2)))))
 
-  (it "with negation"
-    (expect 1 (not (to-be 2)))
-    (expect 1 (not (not (to-be 1))))
-    (expect 1 (not (not (not (to-be 2))))))))
+    (it "with negation"
+      (expect 1 (not (to-be 2)))
+      (expect 1 (not (not (to-be 1))))
+      (expect 1 (not (not (not (to-be 2))))))))
 
 (deftest nested-spec-test
   (let [executed-code (atom #{})]
@@ -109,3 +109,25 @@
 (deftest invalid-expect-usage-test
   (describe "expect should be called inside (it) block"
     (is (thrown-with-msg? IllegalArgumentException #"Spec is undefined" (expect true (to-be-truthy))))))
+
+(deftest my-test
+  (let [foo (atom nil)]
+
+    (describe "A spec"
+      (:before-each #(reset! foo 1))
+      (:after-each #(reset! foo 0))
+
+      (it "it can contain any code"
+        (expect @foo (to-be 1)))
+
+      (it "can have more than one expectation"
+        (expect @foo (to-be 1))
+        (expect true (to-be-truthy)))
+
+      (let [bar (atom nil)]
+        (describe "nested inside a second describe"
+          (:before-each #(reset! bar 1))
+
+          (it "can reference both scopes as needed"
+            (expect @foo (to-be @bar))))))))
+
