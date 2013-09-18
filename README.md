@@ -48,5 +48,5 @@ Argument "actual" should be the last one.
 
 **Will be supported in future releases**
 
-[Spies](http://pivotal.github.io/jasmine/#section-Spies)
-[Disabling specs and suites](http://pivotal.github.io/jasmine/#section-Disabling_Specs_and_Suites)
+- [Spies](http://pivotal.github.io/jasmine/#section-Spies)
+- [Disabling specs and suites](http://pivotal.github.io/jasmine/#section-Disabling_Specs_and_Suites)
