@@ -4,46 +4,60 @@
         overspec.matchers
         overspec.other-ns))
 
+(defmacro should-fail [body]
+  `(let [report-type# (atom nil)]
+     (binding [clojure.test/report #(reset! report-type# (:type %))]
+       ~body)
+     (testing "should fail"
+       (is (= @report-type# :fail )))))
+
 (deftest matchers-test
   (describe "testing matchers:"
 
     (it "to-be"
       (let [x 3]
         (is (= x 3))
-        (expect x (to-be 3))))
+        (expect x (to-be 3))
+        (should-fail (expect x (to-be 4)))))
 
     (it "to-be-truthy"
       (let [x (= 1 1)]
         (is (true? x))
-        (expect x (to-be-truthy))))
+        (expect x (to-be-truthy))
+        (should-fail (expect (not x) (to-be-truthy)))))
 
     (it "to-be-falsy"
       (let [x (= 1 2)]
         (is (false? x))
-        (expect x (to-be-falsy))))
+        (expect x (to-be-falsy))
+        (should-fail (expect (not x) (to-be-falsy)))))
 
     (it "to-be-nil"
       (let [x nil]
         (is (nil? x))
-        (expect nil (to-be-nil))))
+        (expect nil (to-be-nil))
+        (should-fail (expect 5 (to-be-nil)))))
 
     (it "to-contain"
       (let [x #{:a :b :c }]
         (is (contains? x :a ))
-        (expect x (to-contain :a )))
+        (expect x (to-contain :a ))
+        (should-fail (expect x (to-contain :d ))))
 
       (let [x {:a "a" :b "b"}]
         (is (contains? x :a ))
-        (expect x (to-contain :a )))
+        (expect x (to-contain :a ))
+        (should-fail (expect x (to-contain :c ))))
 
       (let [x [:a :b ]]
         (is (contains? x 1))
-        (expect x (to-contain 1)))))
+        (expect x (to-contain 1))
+        (should-fail (expect x (to-contain 2)))))
 
   (it "with negation"
     (expect 1 (not (to-be 2)))
     (expect 1 (not (not (to-be 1))))
-    (expect 1 (not (not (not (to-be 2)))))))
+    (expect 1 (not (not (not (to-be 2))))))))
 
 (deftest nested-spec-test
   (let [executed-code (atom #{})]
@@ -90,3 +104,8 @@
             (is (= @state [:before-1 :before-2 :before-3 ])))
 
           (is (= @state [:before-1 :before-2 :before-3 :after-3 :after-1 ])))))))
+
+
+(deftest invalid-expect-usage-test
+  (describe "expect should be called inside (it) block"
+    (is (thrown-with-msg? IllegalArgumentException #"Spec is undefined" (expect true (to-be-truthy))))))
