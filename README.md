@@ -85,9 +85,13 @@ Specs could be nested as well. It works fine.
 As far there are no lots of matchers supported by Overspec.
 
 >`(expect x (to-be y))` passes if `(= x y)`=>`true`
+>
 >`(expect x (to-be-truthy))` passes if `(true? x)`=>`true`
+>
 >`(expect x (to-be-falsy))` passes if `(false? x)`=>`true`
+>
 >`(expect x (to-contain y))` passes if `(contains? x y)`=>`true`
+>
 >`(expect x (to-be-nil))` passes if `(nil? x)`=>`true`
 
 ### Define your own matchers
