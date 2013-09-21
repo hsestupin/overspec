@@ -11,7 +11,51 @@ Documentation can be found here http://pivotal.github.io/jasmine/
 [org.clojars.hsestupin/overspec "0.1.0"]
 ```
 
+### Before and After
+
+A suite can have a :before-each declaration. It's a just a simple zero-arg function that is run before each spec belonged for `describe` scope. For example:
+
+```clojure
+(deftest my-test
+  (let [suite-wide-foo (atom nil)]
+    (describe "some suite"
+      (:before-each #(reset! suite-wide-foo 1))
+      (it "should equal 1"
+        (expect @suite-wide-foo (to-be 1))))))
+```
+
+Similarly, there is an `after-each` declaration. It's also just a zero-arg function that is run after each spec belonged for `describe` scope. For example:
+
+```clojure
+(deftest my-test
+  (let [suite-wide-foo (atom 1)]
+    (describe "some suite"
+      (:after-each #(reset! suite-wide-foo 0))
+      (it "should equal 1"
+        (expect @suite-wide-foo (to-be 1)))
+
+      (it "should equal 0 after"
+        (expect @suite-wide-foo (to-be 0))))))
+```
+
+A spec may require some code to be executed after the spec has finished running; the code will run whether the spec finishes successfully or not. This function is also zero-arg.
+
+```clojure
+(deftest my-test
+  (let [suite-wide-foo (atom 1)]
+    (describe "some suite"
+
+      (it "should equal 1 and sets to 0 after"
+        (expect @suite-wide-foo (to-be 1))
+        (:after #(reset! suite-wide-foo 0)))
+
+      (it "should equal 0 after"
+        (expect @suite-wide-foo (to-be 0))))))
+```
+
 ### Example of test specs
+
+Specs could be nested as well. It works fine.
 
 ```clojure
 (deftest my-test
@@ -35,6 +79,16 @@ Documentation can be found here http://pivotal.github.io/jasmine/
           (it "can reference both scopes as needed"
             (expect @foo (to-be @bar))))))))
 ```
+
+### Supported matchers
+
+As far there are no lots of matchers supported by Overspec.
+
+>`(expect x (to-be y))` passes if `(= x y)`=>`true`
+>`(expect x (to-be-truthy))` passes if `(true? x)`=>`true`
+>`(expect x (to-be-falsy))` passes if `(false? x)`=>`true`
+>`(expect x (to-contain y))` passes if `(contains? x y)`=>`true`
+>`(expect x (to-be-nil))` passes if `(nil? x)`=>`true`
 
 ### Define your own matchers
 

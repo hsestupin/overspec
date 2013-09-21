@@ -100,10 +100,11 @@
           (:after-each #(swap! state conj :after-3 ))
 
           (swap! state empty)
-          (it "<spec 3>"
+          (it "<spec 3 with finally block>"
+            (:after #(swap! state conj :after ))
             (is (= @state [:before-1 :before-2 :before-3 ])))
 
-          (is (= @state [:before-1 :before-2 :before-3 :after-3 :after-1 ])))))))
+          (is (= @state [:before-1 :before-2 :before-3 :after :after-3 :after-1 ])))))))
 
 
 (deftest invalid-expect-usage-test
@@ -122,6 +123,7 @@
 
       (it "can have more than one expectation"
         (expect @foo (to-be 1))
+        (:after #(println "spec is closed"))
         (expect true (to-be-truthy)))
 
       (let [bar (atom nil)]
@@ -131,3 +133,13 @@
           (it "can reference both scopes as needed"
             (expect @foo (to-be @bar))))))))
 
+(deftest my-test
+  (let [suite-wide-foo (atom 1)]
+    (describe "some suite"
+
+      (it "should equal 1 and sets to 0 after"
+        (expect @suite-wide-foo (to-be 1))
+        (:after #(reset! suite-wide-foo 0)))
+
+      (it "should equal 0 after"
+        (expect @suite-wide-foo (to-be 0))))))
