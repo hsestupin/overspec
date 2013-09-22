@@ -50,8 +50,8 @@
         (should-fail (expect x (to-contain :c ))))
 
       (let [x [:a :b ]]
-        (is (contains? x 2))
-        (expect x (to-contain 2))
+        (is (contains? x 1))
+        (expect x (to-contain 1))
         (should-fail (expect x (to-contain 2)))))
 
     (it "with negation"
