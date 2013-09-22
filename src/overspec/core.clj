@@ -6,6 +6,7 @@
 (def ^:dynamic *before-fns* [])
 (def ^:dynamic *after-fns* [])
 (def ^:dynamic *within-spec?* false)
+(def ^:dynamic *not?* false) ; it's true if core.clojure/not was used odd number of times
 
 (defmacro when-within-spec [body]
   `(if *within-spec?*
@@ -13,15 +14,17 @@
      (throw (IllegalArgumentException. "Spec is undefined"))))
 
 (defmacro expect
-  ([x expectation]
-    `(expect ~x ~expectation nil))
-  ([x expectation msg]
-    (if (starts-with-not? expectation)
+  ([x matcher]
+    `(expect ~x ~matcher nil))
+  ([x matcher msg]
+    (if (starts-with-not? matcher)
       `(when-within-spec
-         (binding [overspec.matchers/*not?* (not overspec.matchers/*not?*)]
-           (expect ~x ~@(rest expectation) ~msg)))
+         (binding [*not?* (not *not?*)]
+           (expect ~x ~@(rest matcher) ~msg)))
       `(when-within-spec
-         (~@expectation ~x ~msg)))))
+         (if *not?*
+           (try-expr ~msg (not (~@matcher ~x)))
+           (try-expr ~msg (~@matcher ~x)))))))
 
 (defmacro it
   [string & body]

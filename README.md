@@ -11,6 +11,8 @@ Documentation can be found here http://pivotal.github.io/jasmine/
 [org.clojars.hsestupin/overspec "0.1.0"]
 ```
 
+That release is stable but some functionality is not available yet.
+
 ### Before and After
 
 A suite can have a :before-each declaration. It's a just a simple zero-arg function that is run before each spec belonged for `describe` scope. For example:
@@ -109,6 +111,7 @@ In this case your custom matcher can be defined like this:
 ```
 
 Argument "actual" should be the last one.
+Note: defining matchers mechanism can be changed since I'm still working on library.
 
 ### Will be supported in future releases
 
