@@ -110,3 +110,11 @@
 (deftest invalid-expect-usage-test
   (describe "expect should be called inside (it) block"
     (is (thrown-with-msg? IllegalArgumentException #"Spec is undefined" (expect true (to-be-truthy))))))
+
+(deftest disable-specs&suites-test
+  (describe "check"
+    (xit "disabled spec"
+      (is false "should not be executed")))
+
+  (xdescribe "check disabled suite"
+    (is false "should not be executed")))

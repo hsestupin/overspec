@@ -45,6 +45,9 @@
              ~(when finally-fn `(~finally-fn))))
          (invoke-all (reverse current-after-fns#)))))) ; invoke after-each fns in reverse order
 
+(defmacro xit [string & body]
+  `())
+
 (defmacro describe
   [string & body]
   (let [befores (filter #(= :before-each (first %)) body)
@@ -57,3 +60,7 @@
                *after-fns* (conj *after-fns* ~(sfirst afters))
                *testing-contexts* (conj *testing-contexts* ~string)]
        ~@others)))
+
+(defmacro xdescribe
+  [string & body]
+  `())
