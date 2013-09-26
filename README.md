@@ -98,22 +98,26 @@ As far there are no lots of matchers supported by Overspec.
 
 ### Define your own matchers
 
-You could define your own matchers with defmatcher macro. Lets assume you want to make sure that expected value belongs to interval between a and b:
+If you need you could define your own matchers. Lets assume you want to make sure that expected value belongs to interval between a and b:
 
 ```clojure
 (expect 3 (to-be-between 2 5))
 ```
 
-In this case your custom matcher can be defined like this:
+In this case your custom matcher can be defined like simple predicate. if that function returns true than spec passes.
 ```clojure
-(defmatcher to-be-between [a b actual]
+(defn to-be-between [a b actual]
   (and (< actual b) (> actual a)))
 ```
 
 Argument "actual" should be the last one.
+
 Note: defining matchers mechanism can be changed since I'm still working on library.
+
+### Disabling Specs and Suites
+
+Suites and specs can be disabled with the xdescribe and xit functions, respectively. These suites and specs are skipped when run and thus their results will not appear in the results.
 
 ### Will be supported in future releases
 
 - [Spies](http://pivotal.github.io/jasmine/#section-Spies)
-- [Disabling specs and suites](http://pivotal.github.io/jasmine/#section-Disabling_Specs_and_Suites)
