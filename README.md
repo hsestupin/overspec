@@ -8,10 +8,9 @@ Documentation can be found here http://pivotal.github.io/jasmine/
 ### The Most Recent Version
 
 ``` clojure
-[org.clojars.hsestupin/overspec "0.1.0"]
+[org.clojars.hsestupin/overspec "0.1.1"]
 ```
 
-That release is stable but some functionality is not available yet.
 
 ### Before and After
 
@@ -57,7 +56,7 @@ A spec may require some code to be executed after the spec has finished running;
 
 ### Example of test specs
 
-Specs could be nested as well. It works fine.
+Specs could be nested as well. It works fine. Clojure original scope rules are applied.
 
 ```clojure
 (deftest my-test
@@ -112,12 +111,10 @@ In this case your custom matcher can be defined like simple predicate. if that f
 
 Argument "actual" should be the last one.
 
-Note: defining matchers mechanism can be changed since I'm still working on library.
-
 ### Disabling Specs and Suites
 
 Suites and specs can be disabled with the `xdescribe` and `xit` functions, respectively. These suites and specs are skipped when run and thus their results will not appear in the results.
 
 ### Will be supported in future releases
 
-- [Spies](http://pivotal.github.io/jasmine/#section-Spies)
+- [Spies](http://pivotal.github.io/jasmine/#section-Spies) ( I'm still not sure, I doubt that true functional style shouldn't support building some expectations about calling functions)

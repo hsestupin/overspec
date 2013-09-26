@@ -1,8 +1,7 @@
 (ns overspec.core-test
   (:use clojure.test
         overspec.core
-        overspec.matchers
-        overspec.other-ns))
+        overspec.matchers))
 
 (defmacro should-fail [body]
   `(let [report-type# (atom nil)]

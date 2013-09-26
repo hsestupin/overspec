@@ -1,4 +1,4 @@
-(defproject org.clojars.hsestupin/overspec "0.1.0"
+(defproject org.clojars.hsestupin/overspec "0.1.1"
   :description "Clojure port of Jasmine BDD"
   :url "https://github.com/hsestupin/overspec"
   :license {:name "Eclipse Public License"
