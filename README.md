@@ -116,7 +116,7 @@ Note: defining matchers mechanism can be changed since I'm still working on libr
 
 ### Disabling Specs and Suites
 
-Suites and specs can be disabled with the xdescribe and xit functions, respectively. These suites and specs are skipped when run and thus their results will not appear in the results.
+Suites and specs can be disabled with the `xdescribe` and `xit` functions, respectively. These suites and specs are skipped when run and thus their results will not appear in the results.
 
 ### Will be supported in future releases
 
