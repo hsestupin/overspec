@@ -1,9 +1,9 @@
 overspec
 ========
 
-Clojure port of Jasmine BDD (https://github.com/pivotal/jasmine).
+Clojure port of Jasmine BDD (https://github.com/jasmine/jasmine).
 
-Documentation can be found here http://pivotal.github.io/jasmine/
+Documentation can be found here http://jasmine.github.io/
 
 ### The Most Recent Version
 
